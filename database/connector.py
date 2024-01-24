@@ -1,5 +1,3 @@
-from tkinter import messagebox
-
 import mysql.connector
 from mysql.connector import Error
 
@@ -18,10 +16,10 @@ class ConnectionToMySqlServer:
                                                       user=self.username,
                                                       password=self.password)
             if self.connection.is_connected():
-                messagebox.showinfo(title="Login Success", message="You successfully logged in.")
+                print("You successfully logged in.")
                 self.is_connected = 1
         except Error as e:
-            messagebox.showerror(title="Error", message="Invalid login.")
+            print("Invalid login.")
 
     def create_user(self, username: str, password: str, email: str):
         command = f"INSERT INTO Users (username, username_password, email) VALUES('{username}', '{password}', '{email}')"

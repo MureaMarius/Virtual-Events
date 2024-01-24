@@ -1,15 +1,14 @@
 import json
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify
 
 from database.connector import ConnectionToMySqlServer
-
-app = Flask(__name__)
+from main import app
 
 my_connection = ConnectionToMySqlServer("root", "root")
 my_connection.connect_to_mysql_server()
 
 
-@app.route('/', methods=['POST'])
+@app.route('/create_user', methods=['GET', 'POST'])
 def create_user():
     record = json.loads(request.data)
 

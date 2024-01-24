@@ -1,7 +1,9 @@
-from flask import Flask
+from api import home
+from flask import *
 
-from authentification import signup
-from authentification.signup import app
+app = Flask(__name__, template_folder='templates')
+
+app.add_url_rule('/', view_func=home.home_page)
 
 
 def main():
