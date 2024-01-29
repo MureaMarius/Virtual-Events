@@ -1,10 +1,10 @@
 import json
 
-from database.connector import ConnectionToMySqlServer
-from utilities import validations
-from flask import request, jsonify, flash
+from backend.database.connector import ConnectionToMySqlServer
+from backend.utilities import validations, constants
+from flask import request, jsonify
 
-my_connection = ConnectionToMySqlServer("root", "root")
+my_connection = ConnectionToMySqlServer(constants.DB_CONSTANTS.DB_USERNAME, constants.DB_CONSTANTS.DB_PASSWORD)
 my_connection.connect_to_mysql_server()
 
 

@@ -1,6 +1,6 @@
 from flask import *
 
-from database.connector import ConnectionToMySqlServer
+from backend.database.connector import ConnectionToMySqlServer
 
 my_connection = ConnectionToMySqlServer("root", "root")
 my_connection.connect_to_mysql_server()
