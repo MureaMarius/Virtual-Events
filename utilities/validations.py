@@ -1,4 +1,5 @@
 import random
+from utilities import constants
 
 
 def password_validation(my_pass: str):
@@ -43,8 +44,8 @@ def create_random_password():
 def check_users(username: str, email: str, list_of_users: list):
     for user in list_of_users:
         if user[1] == username:
-            return "Invalid username -- try another one"
+            return constants.Users_constants.INVALID_USER_MESSAGE
         elif user[3] == email:
-            return "Email already used"
+            return constants.Users_constants.INVALID_EMAIL_MESSAGE
 
-    return None
+    return True
