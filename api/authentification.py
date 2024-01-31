@@ -1,39 +1,32 @@
 import json
 
 from main import app
-from instances.user import get_users, User
-from flask import request, jsonify, render_template
+from instances.user import User, update_user
+from flask import request, jsonify
 
 
 @app.route('/create_user', methods=['POST'])
 def create_user():
     record = json.loads(request.data)
     username, password, email = record['username'], record['username_password'], record['email']
+    user_creation_status = User(username, password, email).create_user()
 
-    user_is_created = User(username, password, email).create_user()
-
-    if user_is_created is not True:
-        print(user_is_created)
-
-    return jsonify(record)
+    return jsonify(user_creation_status)
 
 
 @app.route('/login', methods=['GET'])
 def login():
-    error = None
-    current_users = get_users()
+    username, password = request.form['username'], request.form['username_password']
+    login_status = User(username, password, "").check_user()
 
-    if request.method == 'POST':
-        user_exist = False
-        for user in current_users:
-            if user[1] == request.form['username']:
-                user_exist = True
-                if user[2] != request.form['username_password']:
-                    print("Incorect password")
-                else:
-                    print("Login with SUCCESS")
+    return jsonify(login_status)
 
-        if not user_exist:
-            print("User doesn't exist")
 
-    return render_template('/templates/login.html', error=error)
+@app.route('/update_user', methods=['PUT'])
+def update_user_info():
+    interes_area, number_of_events, username, email = (request.form['interes_area'], request.form['number_of_events'],
+                                                       request.form['username'], request.form['email'])
+
+    update_status = update_user(interes_area, int(number_of_events), username, email)
+
+    return jsonify(update_status)
