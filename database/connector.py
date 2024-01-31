@@ -25,7 +25,7 @@ class ConnectionToMySqlServer:
             print("Invalid login.")
 
     def check_if_table_exists(self):
-        tables = ["users", "events"]
+        tables = ["events", "users"]
 
         for table in tables:
             command = (
@@ -44,6 +44,7 @@ class ConnectionToMySqlServer:
                     elif table == "events":
                         command = constants.Db_constants.DB_CREATE_EVENTS_TABLE
 
+                    print(f"Table {table} is created with the following command: ", command)
                     cursor.execute(command)
                 else:
                     print(f"Table {table} exists!")

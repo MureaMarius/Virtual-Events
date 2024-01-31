@@ -1,12 +1,15 @@
+import random
+
 from utilities import constants, validations
 from application import my_connection
+from instances.Events import get_events_by_domain
 
 
 def get_users():
     command = "SELECT * FROM users"
 
     if my_connection.is_connected:
-        print("DB will be interogated with the following command: ", command)
+        print("DB will be interrogated with the following command: ", command)
 
         cursor = my_connection.connection.cursor()
         cursor.execute(command)
@@ -17,7 +20,7 @@ def get_users():
 def get_user_id(username: str, email: str):
     command = f"SELECT id FROM users WHERE username = '{username}' and email = '{email}'"
     if my_connection.is_connected:
-        print("DB will be interogated with the following command: ", command)
+        print("DB will be interrogated with the following command: ", command)
 
         cursor = my_connection.connection.cursor()
         cursor.execute(command)
@@ -25,9 +28,8 @@ def get_user_id(username: str, email: str):
         return cursor.fetchall()
 
 
-def update_user(interes_area: str, number_of_events: int, username: str, email: str):
-    command = (f"UPDATE users SET interes_area = '{interes_area}', number_of_events = {number_of_events} WHERE "
-               f"username = '{username}' and email = '{email}'")
+def update_user(interes_area: str, username: str, email: str):
+    command = f"UPDATE users SET interes_area = '{interes_area}' WHERE username = '{username}' and email = '{email}'"
 
     if my_connection.is_connected:
         print("DB will be updated with the following command: ", command)
@@ -37,6 +39,24 @@ def update_user(interes_area: str, number_of_events: int, username: str, email: 
         my_connection.connection.commit()
 
     return constants.Users_constants.USER_UPDATE_STATUS
+
+
+def register_user(interes_area: str, username: str):
+    events_id = get_events_by_domain(interes_area)
+    if len(events_id) == 0:
+        return constants.Users_constants.USER_CANT_BE_REGISTERED
+    else:
+        selected_id = events_id[random.randint(0, len(events_id) - 1)][0]
+
+        command = f"UPDATE users SET event_id = '{selected_id}' WHERE username = '{username}'"
+        if my_connection.is_connected:
+            print("DB will be updated with the following command: ", command)
+            cursor = my_connection.connection.cursor()
+            cursor.execute(command)
+
+            my_connection.connection.commit()
+
+        return constants.Users_constants.USER_UPDATE_STATUS
 
 
 class User:
@@ -81,3 +101,16 @@ class User:
                     return constants.Users_constants.LOGIN_SUCCESSFULLY
 
         return constants.Users_constants.INVALID_USERNAME_LOGIN_MESSAGE
+
+    def delete_user(self):
+        user_id = get_user_id(self.username, self.email)[0][0]
+        command = f"DELETE FROM users WHERE id = {user_id}"
+
+        if my_connection.is_connected:
+            print("DB will be updated with the following command: ", command)
+            cursor = my_connection.connection.cursor()
+            cursor.execute(command)
+
+            my_connection.connection.commit()
+
+        return constants.Users_constants.USER_DELETE_STATUS

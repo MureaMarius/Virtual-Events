@@ -11,4 +11,4 @@ app.config['SESSION_TYPE'] = 'filesystem'
 my_connection = ConnectionToMySqlServer(constants.Db_constants.DB_USERNAME, constants.Db_constants.DB_PASSWORD)
 my_connection.connect_to_mysql_server()
 
-from api import authentification
+from api import account, events_api

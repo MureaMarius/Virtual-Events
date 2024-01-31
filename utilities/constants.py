@@ -8,9 +8,12 @@ class Db_constants:
     DB_USERS_TABLE = "users"
     DB_EVENTS_TABLE = "events"
 
-    DB_CREATE_USERS_TABLE = ("CREATE TABLE users(id int PRIMARY KEY, username varchar(255), username_password varchar(255), email varchar(255), "
-                             "interes_area varchar(255), number_of_events int)")
-    DB_CREATE_EVENTS_TABLE = "CREATE TABLE events(id int PRIMARY KEY, name varchar(255), participants int)"
+    DB_CREATE_USERS_TABLE = (
+        "CREATE TABLE users(id int NOT NULL, username varchar(255), username_password varchar(255), email varchar(255),"
+        "interes_area varchar(255), event_id int, PRIMARY KEY (id), FOREIGN KEY (event_id) REFERENCES events(event_id))")
+    DB_CREATE_EVENTS_TABLE = (
+        "CREATE TABLE events(event_id int NOT NULL, domain varchar(255), name_of_event varchar(255), "
+        "max_number_of_participants int, current_number_of_participants int, PRIMARY KEY (event_id))")
 
 
 class Users_constants:
@@ -27,5 +30,11 @@ class Users_constants:
 
     USER_CREATION_STATUS = "User created with SUCCESS"
     USER_UPDATE_STATUS = "User updated with SUCCESS"
+    USER_DELETE_STATUS = "User deleted with SUCCESS"
     LOGIN_SUCCESSFULLY = "Login with SUCCESS"
 
+    USER_CANT_BE_REGISTERED = "Current user can't be registered to some events from his domain area"
+
+
+class Events_constants:
+    EVENT_CREATION_STATUS = "Event created with SUCCESS"
