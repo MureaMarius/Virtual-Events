@@ -2,7 +2,7 @@ import random
 
 from utilities import constants, validations
 from application import my_connection
-from instances.Events import get_events_by_domain
+from instances.Events import get_events_by_domain, check_if_event_is_full
 
 
 def get_users():
@@ -11,10 +11,13 @@ def get_users():
     if my_connection.is_connected:
         print("DB will be interrogated with the following command: ", command)
 
-        cursor = my_connection.connection.cursor()
-        cursor.execute(command)
+        try:
+            with my_connection.connection.cursor() as cursor:
+                cursor.execute(command)
+        except Exception as e:
+            print("Error occurred: ", e)
 
-        return cursor.fetchall()
+    return cursor.fetchall(), constants.Status_codes.STATUS_OK
 
 
 def get_user_id(username: str, email: str):
@@ -22,10 +25,13 @@ def get_user_id(username: str, email: str):
     if my_connection.is_connected:
         print("DB will be interrogated with the following command: ", command)
 
-        cursor = my_connection.connection.cursor()
-        cursor.execute(command)
+        try:
+            with my_connection.connection.cursor() as cursor:
+                cursor.execute(command)
+        except Exception as e:
+            print("Error occurred: ", e)
 
-        return cursor.fetchall()
+    return cursor.fetchall(), constants.Status_codes.STATUS_OK
 
 
 def update_user(interes_area: str, username: str, email: str):
@@ -33,12 +39,15 @@ def update_user(interes_area: str, username: str, email: str):
 
     if my_connection.is_connected:
         print("DB will be updated with the following command: ", command)
-        cursor = my_connection.connection.cursor()
-        cursor.execute(command)
 
-        my_connection.connection.commit()
+        try:
+            with my_connection.connection.cursor() as cursor:
+                cursor.execute(command)
+                my_connection.connection.commit()
+        except Exception as e:
+            print("Error occurred: ", e)
 
-    return constants.Users_constants.USER_UPDATE_STATUS
+    return constants.Users_constants.USER_UPDATE_STATUS, constants.Status_codes.STATUS_OK
 
 
 def register_user(interes_area: str, username: str):
@@ -46,29 +55,38 @@ def register_user(interes_area: str, username: str):
     if len(events_id) == 0:
         return constants.Users_constants.USER_CANT_BE_REGISTERED
     else:
-        selected_id = events_id[random.randint(0, len(events_id) - 1)][0]
+        selected_id = events_id[0][random.randint(0, len(events_id) - 1)][0]
+
+        if check_if_event_is_full(selected_id) is True:
+            return constants.Events_constants.EVENT_IS_FULL
 
         command = f"UPDATE users SET event_id = '{selected_id}' WHERE username = '{username}'"
         if my_connection.is_connected:
             print("DB will be updated with the following command: ", command)
-            cursor = my_connection.connection.cursor()
-            cursor.execute(command)
 
-            my_connection.connection.commit()
+            try:
+                with my_connection.connection.cursor() as cursor:
+                    cursor.execute(command)
+                    my_connection.connection.commit()
+            except Exception as e:
+                print("Error occurred: ", e)
 
-        return constants.Users_constants.USER_UPDATE_STATUS
+        return constants.Users_constants.USER_UPDATE_STATUS, constants.Status_codes.STATUS_OK
 
 
 def register_user_to_specific_event(event_id: int, username: str):
     command = f"UPDATE users SET event_id = '{event_id}' WHERE username = '{username}'"
     if my_connection.is_connected:
         print("DB will be updated with the following command: ", command)
-        cursor = my_connection.connection.cursor()
-        cursor.execute(command)
 
-        my_connection.connection.commit()
+        try:
+            with my_connection.connection.cursor() as cursor:
+                cursor.execute(command)
+                my_connection.connection.commit()
+        except Exception as e:
+            print("Error occurred: ", e)
 
-    return constants.Users_constants.USER_UPDATE_STATUS
+    return constants.Users_constants.USER_UPDATE_STATUS, constants.Status_codes.STATUS_OK
 
 
 class User:
@@ -78,8 +96,7 @@ class User:
         self.email = email
 
     def create_user(self):
-        current_users = get_users()
-        new_id = len(current_users)
+        current_users = get_users()[0]
 
         username_email_verification = validations.check_users(self.username, self.email, current_users)
         password_verification = validations.password_validation(self.password)
@@ -90,8 +107,9 @@ class User:
         if password_verification is not True:
             return constants.Users_constants.INVALID_PASSWORD_CREATION_MESSAGE, constants.Status_codes.BAD_REQUEST
 
-        command = (f"INSERT INTO users (id, username, username_password, email) VALUES({new_id + 1}, "
-                   f"'{self.username}', '{self.password}', '{self.email}')")
+        command = (f"INSERT INTO users (username, username_password, email) "
+                   f"VALUES('{self.username}', '{self.password}', '{self.email}')")
+
         if my_connection.is_connected:
             print("DB will be updated with the following command: ", command)
 
@@ -123,9 +141,12 @@ class User:
 
         if my_connection.is_connected:
             print("DB will be updated with the following command: ", command)
-            cursor = my_connection.connection.cursor()
-            cursor.execute(command)
 
-            my_connection.connection.commit()
+            try:
+                with my_connection.connection.cursor() as cursor:
+                    cursor.execute(command)
+                    my_connection.connection.commit()
+            except Exception as e:
+                print("Error occurred: ", e)
 
-        return constants.Users_constants.USER_DELETE_STATUS
+        return constants.Users_constants.USER_DELETE_STATUS, constants.Status_codes.STATUS_OK

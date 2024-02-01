@@ -4,7 +4,6 @@ import instances.User
 from main import app
 from instances.User import User, update_user, register_user, get_users
 from flask import request, jsonify
-from utilities import constants
 
 
 @app.route('/create_user', methods=['POST'])

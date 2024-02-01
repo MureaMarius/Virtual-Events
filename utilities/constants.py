@@ -9,10 +9,10 @@ class Db_constants:
     DB_EVENTS_TABLE = "events"
 
     DB_CREATE_USERS_TABLE = (
-        "CREATE TABLE users(id int NOT NULL, username varchar(255), username_password varchar(255), email varchar(255),"
+        "CREATE TABLE users(id int NOT NULL AUTO_INCREMENT, username varchar(255), username_password varchar(255), email varchar(255),"
         "interes_area varchar(255), event_id int, PRIMARY KEY (id), FOREIGN KEY (event_id) REFERENCES events(event_id))")
     DB_CREATE_EVENTS_TABLE = (
-        "CREATE TABLE events(event_id int NOT NULL, domain varchar(255), name_of_event varchar(255), "
+        "CREATE TABLE events(event_id int NOT NULL AUTO_INCREMENT, domain varchar(255), name_of_event varchar(255), "
         "max_number_of_participants int, current_number_of_participants int, PRIMARY KEY (event_id))")
 
 
@@ -38,7 +38,9 @@ class Users_constants:
 
 class Events_constants:
     EVENT_CREATION_STATUS = "Event created with SUCCESS"
+    EVENT_IS_FULL = "Selected event is full"
     NO_USERS_REGISTERED = "There are no users registered at this event"
+    NUMBER_OF_PARTICIPANTS_EXCEDEED = "Number of participants exceeded"
 
 
 class Status_codes:

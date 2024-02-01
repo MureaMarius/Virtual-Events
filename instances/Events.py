@@ -8,10 +8,13 @@ def get_events():
     if my_connection.is_connected:
         print("DB will be interrogated with the following command: ", command)
 
-        cursor = my_connection.connection.cursor()
-        cursor.execute(command)
+        try:
+            with my_connection.connection.cursor() as cursor:
+                cursor.execute(command)
+        except Exception as e:
+            print("Error occurred: ", e)
 
-        return cursor.fetchall()
+    return cursor.fetchall(), constants.Status_codes.STATUS_OK
 
 
 def get_events_by_domain(domain: str):
@@ -20,10 +23,13 @@ def get_events_by_domain(domain: str):
     if my_connection.is_connected:
         print("DB will be interrogated with the following command: ", command)
 
-        cursor = my_connection.connection.cursor()
-        cursor.execute(command)
+        try:
+            with my_connection.connection.cursor() as cursor:
+                cursor.execute(command)
+        except Exception as e:
+            print("Error occurred: ", e)
 
-        return cursor.fetchall()
+    return cursor.fetchall(), constants.Status_codes.STATUS_OK
 
 
 def get_users_registered_at_event(event_id: int):
@@ -43,6 +49,25 @@ def get_users_registered_at_event(event_id: int):
     return constants.Events_constants.NO_USERS_REGISTERED, constants.Status_codes.STATUS_OK
 
 
+def check_if_event_is_full(event_id: int):
+    command = (f"SELECT max_number_of_participants, current_number_of_participants FROM events "
+               f"WHERE event_id = {event_id}")
+
+    if my_connection.is_connected:
+        try:
+            with my_connection.connection.cursor() as cursor:
+                cursor.execute(command)
+                event_details = cursor.fetchall()
+
+                max_number_of_participants, current_number_of_participants = event_details[0], event_details[1]
+                if current_number_of_participants == max_number_of_participants:
+                    return True
+        except Exception as e:
+            print("Error occurred: ", e)
+
+    return False
+
+
 class Events:
     def __init__(self, domain: str, name_of_event: str, max_number_of_participants: int,
                  current_number_of_participants):
@@ -52,19 +77,18 @@ class Events:
         self.current_number_of_participants = current_number_of_participants
 
     def create_event(self):
-        current_events = get_events()
-        new_id = len(current_events)
-
-        command = (f"INSERT INTO events (event_id, domain, name_of_event, max_number_of_participants, "
-                   f"current_number_of_participants) VALUES({new_id + 1},"
-                   f"'{self.domain}', '{self.name_of_event}', {self.max_number_of_participants}, {self.current_number_of_participants})")
+        command = (f"INSERT INTO events (domain, name_of_event, max_number_of_participants, "
+                   f"current_number_of_participants) VALUES('{self.domain}', '{self.name_of_event}', "
+                   f"{self.max_number_of_participants}, {self.current_number_of_participants})")
 
         if my_connection.is_connected:
             print("DB will be updated with the following command: ", command)
 
-            cursor = my_connection.connection.cursor()
-            cursor.execute(command)
+            try:
+                with my_connection.connection.cursor() as cursor:
+                    cursor.execute(command)
+                    my_connection.connection.commit()
+            except Exception as e:
+                print("Error occurred: ", e)
 
-            my_connection.connection.commit()
-
-        return constants.Events_constants.EVENT_CREATION_STATUS
+        return constants.Events_constants.EVENT_CREATION_STATUS, constants.Status_codes.STATUS_OK
