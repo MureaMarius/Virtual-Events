@@ -59,6 +59,18 @@ def register_user(interes_area: str, username: str):
         return constants.Users_constants.USER_UPDATE_STATUS
 
 
+def register_user_to_specific_event(event_id: int, username: str):
+    command = f"UPDATE users SET event_id = '{event_id}' WHERE username = '{username}'"
+    if my_connection.is_connected:
+        print("DB will be updated with the following command: ", command)
+        cursor = my_connection.connection.cursor()
+        cursor.execute(command)
+
+        my_connection.connection.commit()
+
+    return constants.Users_constants.USER_UPDATE_STATUS
+
+
 class User:
     def __init__(self, username: str, password: str, email: str):
         self.username = username
@@ -73,22 +85,25 @@ class User:
         password_verification = validations.password_validation(self.password)
 
         if username_email_verification is not True:
-            return username_email_verification
+            return username_email_verification, constants.Status_codes.BAD_REQUEST
 
         if password_verification is not True:
-            return constants.Users_constants.INVALID_PASSWORD_CREATION_MESSAGE
+            return constants.Users_constants.INVALID_PASSWORD_CREATION_MESSAGE, constants.Status_codes.BAD_REQUEST
 
         command = (f"INSERT INTO users (id, username, username_password, email) VALUES({new_id + 1}, "
                    f"'{self.username}', '{self.password}', '{self.email}')")
         if my_connection.is_connected:
             print("DB will be updated with the following command: ", command)
 
-            cursor = my_connection.connection.cursor()
-            cursor.execute(command)
+            try:
+                with my_connection.connection.cursor() as cursor:
+                    cursor.execute(command)
 
-            my_connection.connection.commit()
+                my_connection.connection.commit()
+            except Exception as e:
+                print("Error occurred: ", e)
 
-        return constants.Users_constants.USER_CREATION_STATUS
+        return constants.Users_constants.USER_CREATION_STATUS, constants.Status_codes.CREATED
 
     def check_user(self):
         current_users = get_users()
@@ -96,11 +111,11 @@ class User:
         for user in current_users:
             if user[1] == self.username:
                 if user[2] != self.password:
-                    return constants.Users_constants.INVALID_PASSWORD_LOGIN_MESSAGE
+                    return constants.Users_constants.INVALID_PASSWORD_LOGIN_MESSAGE, constants.Status_codes.UNAUTHORIZED
                 else:
-                    return constants.Users_constants.LOGIN_SUCCESSFULLY
+                    return constants.Users_constants.LOGIN_SUCCESSFULLY, constants.Status_codes.STATUS_OK
 
-        return constants.Users_constants.INVALID_USERNAME_LOGIN_MESSAGE
+        return constants.Users_constants.INVALID_USERNAME_LOGIN_MESSAGE, constants.Status_codes.UNAUTHORIZED
 
     def delete_user(self):
         user_id = get_user_id(self.username, self.email)[0][0]

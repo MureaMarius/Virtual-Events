@@ -26,6 +26,23 @@ def get_events_by_domain(domain: str):
         return cursor.fetchall()
 
 
+def get_users_registered_at_event(event_id: int):
+    command = (f"SELECT users.username, users.email, events.domain, events.name_of_event "
+               f"FROM users INNER JOIN events ON users.event_id = events.event_id WHERE events.event_id = {event_id}")
+
+    if my_connection.is_connected:
+        print("DB will be interrogated with the following command: ", command)
+        try:
+            with my_connection.connection.cursor() as cursor:
+                cursor.execute(command)
+
+            return cursor.fetchall()
+        except Exception as e:
+            print("Error occurred: ", e)
+
+    return constants.Events_constants.NO_USERS_REGISTERED, constants.Status_codes.STATUS_OK
+
+
 class Events:
     def __init__(self, domain: str, name_of_event: str, max_number_of_participants: int,
                  current_number_of_participants):

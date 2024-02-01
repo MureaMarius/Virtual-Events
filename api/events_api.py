@@ -1,7 +1,7 @@
 import json
 
 from main import app
-from instances.Events import Events
+from instances.Events import Events, get_events, get_users_registered_at_event
 from flask import request, jsonify
 
 
@@ -19,6 +19,13 @@ def create_event():
     return jsonify(event_creation_status)
 
 
-@app.route('/get_users_for_event', methods=['GET'])
-def get_all_users_registered_at_event():
-    pass
+@app.route('/get_events', methods=['GET'])
+def get_all_events():
+    return get_events()
+
+
+@app.route('/get_users_for_event/<int:event_id>', methods=['GET'])
+def get_all_users_registered_at_event(event_id: int):
+    users_status, status_code = get_users_registered_at_event(event_id)
+
+    return jsonify(users_status), status_code
