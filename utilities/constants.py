@@ -41,6 +41,7 @@ class Events_constants:
     EVENT_IS_FULL = "Selected event is full"
     NO_USERS_REGISTERED = "There are no users registered at this event"
     NUMBER_OF_PARTICIPANTS_EXCEDEED = "Number of participants exceeded"
+    EVENT_DELETED = "Even deleted with SUCCESS"
 
 
 class Status_codes:

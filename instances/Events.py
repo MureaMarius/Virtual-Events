@@ -42,7 +42,9 @@ def get_users_registered_at_event(event_id: int):
             with my_connection.connection.cursor() as cursor:
                 cursor.execute(command)
 
-            return cursor.fetchall()
+                users = cursor.fetchall()
+                if len(users) > 0:
+                    return users, constants.Status_codes.STATUS_OK
         except Exception as e:
             print("Error occurred: ", e)
 
@@ -67,6 +69,52 @@ def check_if_event_is_full(event_id: int):
 
     return False
 
+
+def increase_number_of_participants(event_id: int):
+    global command
+    command = f"SELECT current_number_of_participants FROM events WHERE event_id = {event_id}"
+
+    if my_connection.is_connected:
+        try:
+            with my_connection.connection.cursor() as cursor:
+                cursor.execute(command)
+                current_number_of_participants = cursor.fetchall()[0][0]
+
+                command = (f"UPDATE events SET current_number_of_participants = {current_number_of_participants + 1} "
+                           f"WHERE event_id = {event_id}")
+
+                cursor.execute(command)
+                my_connection.connection.commit()
+
+        except Exception as e:
+            print("Error occurred: ", e)
+
+    return True
+
+
+def delete_user(event_id: int):
+    global command
+    command = f"SELECT id FROM users WHERE event_id = {event_id}"
+
+    if my_connection.is_connected:
+        try:
+            with my_connection.connection.cursor() as cursor:
+                cursor.execute(command)
+                users_id = cursor.fetchall()[0]
+
+                for user_id in users_id:
+                    command = f"UPDATE users SET event_id = null WHERE id = {user_id}"
+
+                    cursor.execute(command)
+                    my_connection.connection.commit()
+
+                command = f"DELETE FROM events WHERE event_id = {event_id}"
+                cursor.execute(command)
+                my_connection.connection.commit()
+        except Exception as e:
+            print("Error occurred: ", e)
+
+    return constants.Events_constants.EVENT_DELETED, constants.Status_codes.STATUS_OK
 
 class Events:
     def __init__(self, domain: str, name_of_event: str, max_number_of_participants: int,

@@ -1,7 +1,7 @@
 import json
 
 from main import app
-from instances.Events import Events, get_events, get_users_registered_at_event
+from instances.Events import Events, get_events, get_users_registered_at_event, delete_user
 from flask import request, jsonify
 
 
@@ -29,3 +29,10 @@ def get_all_users_registered_at_event(event_id: int):
     users_status, status_code = get_users_registered_at_event(event_id)
 
     return jsonify(users_status), status_code
+
+
+@app.route('/delete_event/<int:event_id>', methods=['DELETE'])
+def delete_event(event_id: int):
+    deletion_status, status_code = delete_user(event_id)
+
+    return jsonify(deletion_status), status_code

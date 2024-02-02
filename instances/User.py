@@ -2,7 +2,7 @@ import random
 
 from utilities import constants, validations
 from application import my_connection
-from instances.Events import get_events_by_domain, check_if_event_is_full
+from instances.Events import get_events_by_domain, check_if_event_is_full, increase_number_of_participants
 
 
 def get_users():
@@ -68,6 +68,8 @@ def register_user(interes_area: str, username: str):
                 with my_connection.connection.cursor() as cursor:
                     cursor.execute(command)
                     my_connection.connection.commit()
+
+                    increase_number_of_participants(selected_id)
             except Exception as e:
                 print("Error occurred: ", e)
 
@@ -76,6 +78,10 @@ def register_user(interes_area: str, username: str):
 
 def register_user_to_specific_event(event_id: int, username: str):
     command = f"UPDATE users SET event_id = '{event_id}' WHERE username = '{username}'"
+
+    if check_if_event_is_full(event_id) is True:
+        return constants.Events_constants.EVENT_IS_FULL
+
     if my_connection.is_connected:
         print("DB will be updated with the following command: ", command)
 
@@ -83,6 +89,8 @@ def register_user_to_specific_event(event_id: int, username: str):
             with my_connection.connection.cursor() as cursor:
                 cursor.execute(command)
                 my_connection.connection.commit()
+
+                increase_number_of_participants(event_id)
         except Exception as e:
             print("Error occurred: ", e)
 
