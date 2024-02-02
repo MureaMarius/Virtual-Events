@@ -33,6 +33,7 @@ class Users_constants:
     USER_DELETE_STATUS = "User deleted with SUCCESS"
     LOGIN_SUCCESSFULLY = "Login with SUCCESS"
 
+    NO_USERS_IN_DB = "There are no users in the DB"
     USER_CANT_BE_REGISTERED = "Current user can't be registered to some events from his domain area"
 
 
@@ -42,6 +43,8 @@ class Events_constants:
     NO_USERS_REGISTERED = "There are no users registered at this event"
     NUMBER_OF_PARTICIPANTS_EXCEDEED = "Number of participants exceeded"
     EVENT_DELETED = "Even deleted with SUCCESS"
+    NO_EVENTS_IN_DB = "There are no events in the DB"
+    NO_EVENTS_IN_DB_WITH_SPECIFIC_DOMAIN = "There are no events in the DB with this specific domain"
 
 
 class Status_codes:

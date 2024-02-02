@@ -11,10 +11,12 @@ def get_events():
         try:
             with my_connection.connection.cursor() as cursor:
                 cursor.execute(command)
+
+                return cursor.fetchall(), constants.Status_codes.STATUS_OK
         except Exception as e:
             print("Error occurred: ", e)
 
-    return cursor.fetchall(), constants.Status_codes.STATUS_OK
+    return constants.Events_constants.NO_EVENTS_IN_DB, constants.Status_codes.STATUS_OK
 
 
 def get_events_by_domain(domain: str):
@@ -26,10 +28,12 @@ def get_events_by_domain(domain: str):
         try:
             with my_connection.connection.cursor() as cursor:
                 cursor.execute(command)
+
+                return cursor.fetchall(), constants.Status_codes.STATUS_OK
         except Exception as e:
             print("Error occurred: ", e)
 
-    return cursor.fetchall(), constants.Status_codes.STATUS_OK
+    return constants.Events_constants.NO_EVENTS_IN_DB_WITH_SPECIFIC_DOMAIN, constants.Status_codes.STATUS_OK
 
 
 def get_users_registered_at_event(event_id: int):
@@ -115,6 +119,7 @@ def delete_user(event_id: int):
             print("Error occurred: ", e)
 
     return constants.Events_constants.EVENT_DELETED, constants.Status_codes.STATUS_OK
+
 
 class Events:
     def __init__(self, domain: str, name_of_event: str, max_number_of_participants: int,

@@ -29,36 +29,38 @@ def login():
 
 @app.route('/get_users', methods=['GET'])
 def get_all_users():
-    return get_users()
+    get_users_status, status_code = get_users()
+
+    return jsonify(get_users_status), status_code
 
 
 @app.route('/delete_user', methods=['DELETE'])
 def delete_user():
     username, email = request.form['username'], request.form['email']
-    delete_status = User(username, "", email).delete_user()
+    delete_status, status_code = User(username, "", email).delete_user()
 
-    return jsonify(delete_status)
+    return jsonify(delete_status), status_code
 
 
 @app.route('/update_user', methods=['PUT'])
 def update_user_info():
     interes_area, username, email = (request.form['interes_area'], request.form['username'], request.form['email'])
-    update_status = update_user(interes_area, username, email)
+    update_status, status_code = update_user(interes_area, username, email)
 
-    return jsonify(update_status)
+    return jsonify(update_status), status_code
 
 
 @app.route('/register_user', methods=['PUT'])
 def register_user_to_random_event():
     interes_area, username = request.form['interes_area'], request.form['username']
-    registered_status = register_user(interes_area, username)
+    registered_status, status_code = register_user(interes_area, username)
 
-    return registered_status
+    return jsonify(registered_status), status_code
 
 
 @app.route('/register_user/<int:event_id>', methods=['PUT'])
 def register_user_to_specific_event(event_id: int):
     username = request.form['username']
-    registered_status = instances.User.register_user_to_specific_event(event_id, username)
+    registered_status, status_code = instances.User.register_user_to_specific_event(event_id, username)
 
-    return registered_status
+    return jsonify(registered_status), status_code

@@ -14,10 +14,12 @@ def get_users():
         try:
             with my_connection.connection.cursor() as cursor:
                 cursor.execute(command)
+
+                return cursor.fetchall(), constants.Status_codes.STATUS_OK
         except Exception as e:
             print("Error occurred: ", e)
 
-    return cursor.fetchall(), constants.Status_codes.STATUS_OK
+    return constants.Users_constants.NO_USERS_IN_DB, constants.Status_codes.STATUS_OK
 
 
 def get_user_id(username: str, email: str):
@@ -53,12 +55,12 @@ def update_user(interes_area: str, username: str, email: str):
 def register_user(interes_area: str, username: str):
     events_id = get_events_by_domain(interes_area)
     if len(events_id) == 0:
-        return constants.Users_constants.USER_CANT_BE_REGISTERED
+        return constants.Users_constants.USER_CANT_BE_REGISTERED, constants.Status_codes.STATUS_OK
     else:
         selected_id = events_id[0][random.randint(0, len(events_id) - 1)][0]
 
         if check_if_event_is_full(selected_id) is True:
-            return constants.Events_constants.EVENT_IS_FULL
+            return constants.Events_constants.EVENT_IS_FULL, constants.Status_codes.STATUS_OK
 
         command = f"UPDATE users SET event_id = '{selected_id}' WHERE username = '{username}'"
         if my_connection.is_connected:
@@ -80,7 +82,7 @@ def register_user_to_specific_event(event_id: int, username: str):
     command = f"UPDATE users SET event_id = '{event_id}' WHERE username = '{username}'"
 
     if check_if_event_is_full(event_id) is True:
-        return constants.Events_constants.EVENT_IS_FULL
+        return constants.Events_constants.EVENT_IS_FULL, constants.Status_codes.STATUS_OK
 
     if my_connection.is_connected:
         print("DB will be updated with the following command: ", command)
