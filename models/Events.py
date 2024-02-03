@@ -1,5 +1,5 @@
 from utilities import constants
-from application import my_connection
+from application import my_connection, cursor
 
 
 def get_events():
@@ -9,10 +9,9 @@ def get_events():
         print("DB will be interrogated with the following command: ", command)
 
         try:
-            with my_connection.connection.cursor() as cursor:
-                cursor.execute(command)
+            cursor.execute(command)
+            return cursor.fetchall(), constants.Status_codes.STATUS_OK
 
-                return cursor.fetchall(), constants.Status_codes.STATUS_OK
         except Exception as e:
             print("Error occurred: ", e)
 
@@ -26,10 +25,9 @@ def get_events_by_domain(domain: str):
         print("DB will be interrogated with the following command: ", command)
 
         try:
-            with my_connection.connection.cursor() as cursor:
-                cursor.execute(command)
+            cursor.execute(command)
+            return cursor.fetchall(), constants.Status_codes.STATUS_OK
 
-                return cursor.fetchall(), constants.Status_codes.STATUS_OK
         except Exception as e:
             print("Error occurred: ", e)
 
@@ -43,12 +41,12 @@ def get_users_registered_at_event(event_id: int):
     if my_connection.is_connected:
         print("DB will be interrogated with the following command: ", command)
         try:
-            with my_connection.connection.cursor() as cursor:
-                cursor.execute(command)
+            cursor.execute(command)
 
-                users = cursor.fetchall()
-                if len(users) > 0:
-                    return users, constants.Status_codes.STATUS_OK
+            users = cursor.fetchall()
+            if len(users) > 0:
+                return users, constants.Status_codes.STATUS_OK
+
         except Exception as e:
             print("Error occurred: ", e)
 
@@ -61,13 +59,12 @@ def check_if_event_is_full(event_id: int):
 
     if my_connection.is_connected:
         try:
-            with my_connection.connection.cursor() as cursor:
-                cursor.execute(command)
-                event_details = cursor.fetchall()
+            cursor.execute(command)
+            event_details = cursor.fetchall()
 
-                max_number_of_participants, current_number_of_participants = event_details[0], event_details[1]
-                if current_number_of_participants == max_number_of_participants:
-                    return True
+            max_number_of_participants, current_number_of_participants = event_details[0], event_details[1]
+            if current_number_of_participants == max_number_of_participants:
+                return True
         except Exception as e:
             print("Error occurred: ", e)
 
@@ -80,15 +77,14 @@ def increase_number_of_participants(event_id: int):
 
     if my_connection.is_connected:
         try:
-            with my_connection.connection.cursor() as cursor:
-                cursor.execute(command)
-                current_number_of_participants = cursor.fetchall()[0][0]
+            cursor.execute(command)
+            current_number_of_participants = cursor.fetchall()[0][0]
 
-                command = (f"UPDATE events SET current_number_of_participants = {current_number_of_participants + 1} "
-                           f"WHERE event_id = {event_id}")
+            command = (f"UPDATE events SET current_number_of_participants = {current_number_of_participants + 1} "
+                       f"WHERE event_id = {event_id}")
 
-                cursor.execute(command)
-                my_connection.connection.commit()
+            cursor.execute(command)
+            my_connection.connection.commit()
 
         except Exception as e:
             print("Error occurred: ", e)
@@ -102,19 +98,19 @@ def delete_user(event_id: int):
 
     if my_connection.is_connected:
         try:
-            with my_connection.connection.cursor() as cursor:
-                cursor.execute(command)
-                users_id = cursor.fetchall()[0]
+            cursor.execute(command)
+            users_id = cursor.fetchall()[0]
 
-                for user_id in users_id:
-                    command = f"UPDATE users SET event_id = null WHERE id = {user_id}"
+            for user_id in users_id:
+                command = f"UPDATE users SET event_id = null WHERE id = {user_id}"
 
-                    cursor.execute(command)
-                    my_connection.connection.commit()
-
-                command = f"DELETE FROM events WHERE event_id = {event_id}"
                 cursor.execute(command)
                 my_connection.connection.commit()
+
+            command = f"DELETE FROM events WHERE event_id = {event_id}"
+            cursor.execute(command)
+            my_connection.connection.commit()
+
         except Exception as e:
             print("Error occurred: ", e)
 
@@ -138,9 +134,9 @@ class Events:
             print("DB will be updated with the following command: ", command)
 
             try:
-                with my_connection.connection.cursor() as cursor:
-                    cursor.execute(command)
-                    my_connection.connection.commit()
+                cursor.execute(command)
+                my_connection.connection.commit()
+
             except Exception as e:
                 print("Error occurred: ", e)
 

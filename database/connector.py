@@ -1,3 +1,5 @@
+import os
+
 import mysql.connector
 from mysql.connector import Error
 from utilities import constants
@@ -12,8 +14,8 @@ class ConnectionToMySqlServer:
 
     def connect_to_mysql_server(self):
         try:
-            self.connection = mysql.connector.connect(host=constants.Db_constants.DB_HOST,
-                                                      database=constants.Db_constants.DB_DATABASE,
+            self.connection = mysql.connector.connect(host=os.environ.get("DB_HOST"),
+                                                      database=os.environ.get("DB_DATABASE"),
                                                       user=self.username,
                                                       password=self.password)
             if self.connection.is_connected():
@@ -28,8 +30,9 @@ class ConnectionToMySqlServer:
         tables = ["events", "users"]
 
         for table in tables:
+            db = os.environ.get("DB_DATABASE")
             command = (
-                f"SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{constants.Db_constants.DB_DATABASE}' "
+                f"SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{db}' "
                 f"AND TABLE_NAME = '{table}'")
 
             if self.connection.is_connected():

@@ -1,8 +1,8 @@
 import json
 
-import instances.User
+import models.User
 from main import app
-from instances.User import User, update_user, register_user, get_users
+from models.User import User, update_user, register_user, get_users
 from flask import request, jsonify
 
 
@@ -61,6 +61,6 @@ def register_user_to_random_event():
 @app.route('/register_user/<int:event_id>', methods=['PUT'])
 def register_user_to_specific_event(event_id: int):
     username = request.form['username']
-    registered_status, status_code = instances.User.register_user_to_specific_event(event_id, username)
+    registered_status, status_code = models.User.register_user_to_specific_event(event_id, username)
 
     return jsonify(registered_status), status_code

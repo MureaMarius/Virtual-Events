@@ -1,8 +1,4 @@
 class Db_constants:
-    DB_USERNAME = "root"
-    DB_PASSWORD = "root"
-    DB_HOST = "localhost"
-    DB_DATABASE = "virtual_events"
     DB_SUCCESSFULLY_LOGIN = "You successfully logged in to the DATABASE"
 
     DB_USERS_TABLE = "users"

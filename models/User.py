@@ -1,8 +1,8 @@
 import random
 
 from utilities import constants, validations
-from application import my_connection
-from instances.Events import get_events_by_domain, check_if_event_is_full, increase_number_of_participants
+from application import my_connection, cursor
+from models.Events import get_events_by_domain, check_if_event_is_full, increase_number_of_participants
 
 
 def get_users():
@@ -12,10 +12,9 @@ def get_users():
         print("DB will be interrogated with the following command: ", command)
 
         try:
-            with my_connection.connection.cursor() as cursor:
-                cursor.execute(command)
+            cursor.execute(command)
+            return cursor.fetchall(), constants.Status_codes.STATUS_OK
 
-                return cursor.fetchall(), constants.Status_codes.STATUS_OK
         except Exception as e:
             print("Error occurred: ", e)
 
@@ -28,8 +27,8 @@ def get_user_id(username: str, email: str):
         print("DB will be interrogated with the following command: ", command)
 
         try:
-            with my_connection.connection.cursor() as cursor:
-                cursor.execute(command)
+            cursor.execute(command)
+
         except Exception as e:
             print("Error occurred: ", e)
 
@@ -43,9 +42,9 @@ def update_user(interes_area: str, username: str, email: str):
         print("DB will be updated with the following command: ", command)
 
         try:
-            with my_connection.connection.cursor() as cursor:
-                cursor.execute(command)
-                my_connection.connection.commit()
+            cursor.execute(command)
+            my_connection.connection.commit()
+
         except Exception as e:
             print("Error occurred: ", e)
 
@@ -67,11 +66,10 @@ def register_user(interes_area: str, username: str):
             print("DB will be updated with the following command: ", command)
 
             try:
-                with my_connection.connection.cursor() as cursor:
-                    cursor.execute(command)
-                    my_connection.connection.commit()
+                cursor.execute(command)
+                my_connection.connection.commit()
+                increase_number_of_participants(selected_id)
 
-                    increase_number_of_participants(selected_id)
             except Exception as e:
                 print("Error occurred: ", e)
 
@@ -88,11 +86,11 @@ def register_user_to_specific_event(event_id: int, username: str):
         print("DB will be updated with the following command: ", command)
 
         try:
-            with my_connection.connection.cursor() as cursor:
-                cursor.execute(command)
-                my_connection.connection.commit()
+            cursor.execute(command)
+            my_connection.connection.commit()
 
-                increase_number_of_participants(event_id)
+            increase_number_of_participants(event_id)
+
         except Exception as e:
             print("Error occurred: ", e)
 
@@ -124,8 +122,7 @@ class User:
             print("DB will be updated with the following command: ", command)
 
             try:
-                with my_connection.connection.cursor() as cursor:
-                    cursor.execute(command)
+                cursor.execute(command)
 
                 my_connection.connection.commit()
             except Exception as e:
@@ -153,9 +150,9 @@ class User:
             print("DB will be updated with the following command: ", command)
 
             try:
-                with my_connection.connection.cursor() as cursor:
-                    cursor.execute(command)
-                    my_connection.connection.commit()
+                cursor.execute(command)
+                my_connection.connection.commit()
+
             except Exception as e:
                 print("Error occurred: ", e)
 

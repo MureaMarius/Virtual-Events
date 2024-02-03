@@ -1,7 +1,7 @@
 import json
 
 from main import app
-from instances.Events import Events, get_events, get_users_registered_at_event, delete_user
+from models.Events import Events, get_events, get_users_registered_at_event, delete_user
 from flask import request, jsonify
 
 
